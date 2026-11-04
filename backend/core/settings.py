@@ -64,18 +64,28 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # Database Configuration (Supports DATABASE_URL or individual DB_* variables)
 DATABASE_URL = os.getenv('DATABASE_URL')
 if DATABASE_URL:
-    url = urllib.parse.urlparse(DATABASE_URL)
+    url = urllib.parse.urlsplit(DATABASE_URL)
+    query_params = urllib.parse.parse_qs(url.query)
+    
+    # Neon and cloud Postgres require SSL; extract from query or default to 'require'
+    sslmode = query_params.get('sslmode', ['require'])[0]
+    db_options = {
+        'sslmode': sslmode,
+    }
+    
+    # Note: Do NOT add '-c search_path=...' into options when using cloud poolers (like Neon PgBouncer),
+    # as PgBouncer rejects session-level startup parameters. All AMTS transit models already declare
+    # db_table = 'transit"."<table>' explicitly.
+
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
-            'NAME': url.path[1:],
+            'NAME': url.path.lstrip('/'),
             'USER': url.username,
-            'PASSWORD': url.password,
+            'PASSWORD': urllib.parse.unquote(url.password) if url.password else '',
             'HOST': url.hostname,
             'PORT': url.port or 5432,
-            'OPTIONS': {
-                'options': '-c search_path=transit,public'
-            },
+            'OPTIONS': db_options,
         }
     }
 else:
