@@ -1,0 +1,66 @@
+## AMTS PORTAL ##
+
+**This is AMTS(Ahmedabad municipal transportaion service) live bus PORTAL**
+
+**** For BUS ****
+--> In this PORTAL many buses are available.
+--> There are different type of buses.
+    (eg. normal(Petrol), EV(electric) , EV with AC).
+--> Each bus have different types of Numberplate.
+--> Multiple bus have one Number.
+    (eg. there are 5 any(noraml, EV, EV with AC) buses whose number is 31).
+--> There is many bus for one number, so each bus number use different character.
+    (eg. 31-X, 31-M, 31-Z, etc.)
+--> Different type of bus have different numbers of seats.
+    (eg. normal(Petrol) bus have 34 seats , EV have 30 seats ect.)
+--> Each bus have Number which discribe the path of that particular bus.
+    (eg. bus Number 31 is going to Meghaninager(first-stop) to sarkhej(last-stop) and sarkhej(first-stop) to 
+    Meghaninager(last-stop)(vise versa))
+--> In path(route) have many station are available with Approx distance(300m - 400m).
+    (eg. bus Number 31 have 25 stops)
+--> Each bus have their own schedule.
+    (eg. bus number 31 is start from first-stop at 7am to reach last-stop at 8am , second bus timing start form 7:35 am)
+--> Each path have their particular fix time which that it's take during the travel.
+    (eg. Meghaninager to sarkhej take Approximately 1 hour, similary sarkhej to Meghaninager also take Approx 1 hour to reach)
+--> Each bus have many rounds.
+    (eg. one of the bus of 31 have 5 rounds(Meghaninager to sarkhej and sarkhej to Meghaninager that is one round) per day )
+--> half round also available
+    (eg. 3.5 round means  3 full rounds and one half)
+--> At one time many buses are running.
+    (eg. At 2pm one bus 31 at first-stop , second bus are stop-15 in the route, third bus at stop-22)
+--> Each stop have name.
+    (eg. bus 31 number is going to Meghaninager to sarkhej so it's first-stop name Meghaninager and 
+    last-stop(stop-25) name is sarkhej but which bus are comming from the sarkhej so its first-stop name is sarkhej)
+--> There are many ticket are available with different price(rate). 
+    (eg. 5-ruppes, 10-ruppes, 15-ruppes, 20-ruppes, 25-ruppes)
+--> There are golden ticket also available for male and female with different price(rate) which is work whole day in any AMTS bus.
+    (eg. for male 45 ruppes, and female 35 ruppes).
+--> Each bus have GPS traker who trak the bus live location.
+
+**** For USERS ****
+--> user can show the live location of the bus by searching.
+    (eg. user search the bus number like 31, show the option 31(Meghaninager to sarkhej) and 31(sarkhej to Meghaninager)
+    if user click 31(Meghaninager to sarkhej) then show full path of that route and that all buses which is running 
+    now from Meghaninager to sarkhej , don't show which are running in opposite(sarkhej to Meghaninager) side ).
+--> also user can enter his current stop(location) to destination stop(location) to find reliable bus.
+    (eg. user want to go stop 'A' to stop 'I' then so all reliable buses which is goto stop 'A' to stop 'I')
+--> If destination not reach using one bus, in that case use multiple bus route to reach destination.
+    (eg. if passanger current stop is 'C', they want to goto stop 'H'(destination) but any bus don't  goto directly 'C' to H'
+    so in that case show sortest path like bus1--->form 'C' to 'E' now change bus bus2--->from 'E'to 'H')
+--> User can book online tickets based on traveling.
+    (eg. with date, day, time, current stop to destination stop, gender, age, price(rate))
+--> Show ticket price(5,10,15,20,25 ruppes) based on pickup stop to destination stop also show golden tickets.
+    (eg. user search the bus or path, then show bus name 31-x with ticket price)
+--> User can show all details of the buses.
+    (eg. live location, at what time it come to users stop, how much time it's take to reach user stop to destination 
+    stop,it's croudy or not, it's running or brekdown etc... )
+--> show the detail about bus is delay, advance or on time .
+    (eg. the bus is arrive at stop-'D' usually at 5pm but now bus on stop-'B', so in this case show delay minutes(time))
+
+**** For ADMIN ****
+--> show all details about the buses.
+    (eg. which route have many buses, which bus-stop is more crouded, which bus are very crouded, which time(by day, time) 
+    people use most of buses, which bus gain highest or less booking )
+--> Dashbord of AMTS Portal
+
+
