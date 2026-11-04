@@ -4,164 +4,103 @@ This guide provides step-by-step instructions for deploying the **AMTS Live Bus 
 
 ---
 
-## 🌟 Recommended Architecture (Fastest & Free Tier Available)
+## 🌟 Architecture & Current Status
 
-| Layer | Recommended Host | Free Tier? | Purpose |
+| Layer | Host | Status | Details |
 | :--- | :--- | :--- | :--- |
-| **Frontend UI** | [Vercel](https://vercel.com) | ✅ Yes | Global Edge CDN, auto-builds React+Vite, Free SSL, Instant Deploy |
-| **Backend API** | [Render](https://render.com) or [Railway](https://railway.app) | ✅ Yes | Runs Django 5.1 with Gunicorn WSGI and WhiteNoise static files |
-| **Database** | [Neon](https://neon.tech) or [Supabase](https://supabase.com) | ✅ Yes | Managed Cloud PostgreSQL 16/17 with PostGIS geospatial support |
+| **Database** | [Neon.tech](https://neon.tech) | 🟢 **100% Ready & Seeded** | PostGIS 3.6.4, 22 tables, 14 routes, 536 stops, 31 vehicles, `admin` user created |
+| **Backend API** | [Render](https://render.com) | 🟡 **Ready to Deploy** | Django 5.1 + Gunicorn WSGI + WhiteNoise static files |
+| **Frontend UI** | [Vercel](https://vercel.com) | 🟡 **Ready to Deploy** | React 18 + Vite + Tailwind CSS + Leaflet maps |
 
 ---
 
-## 📋 Pre-Flight Checklist (Already Automated & Ready)
+## 📋 What Has Already Been Done For You
 
-- [x] **Static Files Ready**: `STATIC_ROOT` configured in Django with WhiteNoise integration. `python manage.py collectstatic --noinput` verified (154 static assets).
-- [x] **Production WSGI**: `gunicorn` and `whitenoise` included in [`backend/requirements.txt`](backend/requirements.txt) and [`backend/Procfile`](backend/Procfile).
-- [x] **Dynamic Database URL**: Django settings automatically accept cloud `DATABASE_URL` (Neon / Supabase / Render / AWS RDS).
-- [x] **SPA Direct Routing**: [`frontend/vercel.json`](frontend/vercel.json) and [`frontend/public/_redirects`](frontend/public/_redirects) configured so routes like `/admin-dashboard` refresh cleanly without 404 errors.
-- [x] **Security Exclusions**: [`.gitignore`](.gitignore) created to protect `.env`, secrets, `node_modules`, and virtual environments.
-- [x] **Container Ready**: Complete [`Dockerfile`](frontend/Dockerfile) and [`docker-compose.yml`](docker-compose.yml) for 1-command Docker deployment.
-
----
-
-## 🛠️ Step-by-Step Deployment Instructions
-
-### STEP 1: Push Code to GitHub
-
-1. Open PowerShell / Terminal in `c:\Users\CHIRAG\Desktop\AMTS_Portal`:
-   ```powershell
-   cd c:\Users\CHIRAG\Desktop\AMTS_Portal
-   git init
-   git add .
-   git commit -m "feat: complete production-ready AMTS live portal and municipal admin system"
-   ```
-
-2. Create a new repository on your GitHub account (e.g. `amts-live-portal`).
-
-3. Link and push your repository:
-   ```powershell
-   git remote add origin https://github.com//amts-live-portal.git
-   git branch -M main
-   git push -u origin main
-   ```
+- [x] **Neon Database Configured & Seeded**:
+  - PostgreSQL 18.6 with PostGIS 3.6.4 extension active.
+  - All migrations applied, including `0004_bookedticket_username`.
+  - Transit network imported: 14 lines, 536 stops, 31 fleet vehicles, 31 real-time operating trips.
+  - Admin superuser created (`admin` / `admin@123`).
+- [x] **Neon PgBouncer Fix**: Removed `-c search_path=transit,public` startup parameters in `core/settings.py` so Neon's pooled connection strings connect cleanly without errors.
+- [x] **Git Repository Synced**: All latest backend code, migrations, and static assets pushed to GitHub: `https://github.com/PATNI-CHIRAG/AMTS_BUS_PORTAL.git`.
+- [x] **Static Files Ready**: WhiteNoise configured; `collectstatic` verified.
+- [x] **Frontend Production Build**: Clean build with Vite in <1s with 0 errors.
 
 ---
 
-### STEP 2: Provision Cloud PostgreSQL Database (Neon / Supabase)
+## 🛠️ Step-by-Step Live Deployment Instructions
 
-1. Go to [Neon.tech](https://neon.tech) and create a free project named `amts-portal-db`.
-2. In the Neon console, enable PostGIS extension by running in SQL Editor:
-   ```sql
-   CREATE EXTENSION IF NOT EXISTS postgis;
-   ```
-3. Copy your database connection string:
-   ```
-   postgresql://username:password@ep-cool-flower-12345.ap-southeast-1.aws.neon.tech/amts-portal-db?sslmode=require
-   ```
+### STEP 1: Deploy Django Backend on Render.com
 
----
-
-### STEP 3: Deploy Django Backend on Render.com
-
-1. Go to [Render.com](https://render.com) and click **New +** $\rightarrow$ **Web Service**.
-2. Connect your GitHub repository (`amts-live-portal`).
-3. Configure the service settings:
-   - **Name**: `amts-api`
+1. Sign in to **[Render.com](https://render.com)**.
+2. In the top navigation, click **New +** $\rightarrow$ **Web Service**.
+3. Select **Build and deploy from a Git repository** and connect your repo: `PATNI-CHIRAG/AMTS_BUS_PORTAL`.
+4. Configure the service:
+   - **Name**: `amts-api` (or any name you choose)
+   - **Region**: `Singapore (ap-southeast-1)` *(recommended since your Neon DB is in ap-southeast-1 for ultra-low latency)*
+   - **Branch**: `main`
    - **Root Directory**: `backend`
-   - **Environment**: `Python 3`
+   - **Runtime**: `Python 3`
    - **Build Command**:
      ```bash
-     pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate && python manage.py import_amts_data && python manage.py seed_routes_34_and_50
+     pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate
      ```
    - **Start Command**:
      ```bash
      gunicorn core.wsgi:application --bind 0.0.0.0:$PORT
      ```
-4. Under **Environment Variables**, add:
-   - `DEBUG`: `False`
-   - `SECRET_KEY`: *(Generate a secure random string)*
-   - `ALLOWED_HOSTS`: `*`
-   - `DATABASE_URL`: *(Paste your Neon connection string from Step 2)*
-   - `CORS_ALLOW_ALL_ORIGINS`: `True` *(or your Vercel frontend URL once deployed)*
-5. Click **Create Web Service**.
-6. Once deployed, note your backend live URL (e.g., `https://amts-api.onrender.com`).
+   - **Instance Type**: `Free`
+
+5. Under **Environment Variables**, add the following 5 variables:
+
+   | Key | Value | Notes |
+   | :--- | :--- | :--- |
+   | `DATABASE_URL` | `postgresql://neondb_owner:npg_mPtXS6xEprj9@ep-snowy-fog-aobh3zz1-pooler.c-2.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require` | Your Neon database |
+   | `DEBUG` | `False` | Production mode |
+   | `SECRET_KEY` | `amts-production-super-secret-key-chirag-2026-safe` | Any secure random string |
+   | `ALLOWED_HOSTS` | `*` | Allows Render subdomains |
+   | `CORS_ALLOW_ALL_ORIGINS` | `True` | Allows Vercel frontend requests |
+
+6. Click **Deploy Web Service** (or **Manual Deploy** $\rightarrow$ **Deploy latest commit** if updating an existing service).
+7. Wait 2–3 minutes for the build to finish. Once live, Render will give you your public API URL:
+   `https://amts-api.onrender.com` (or similar).
+8. Test it in your browser: `https://amts-api.onrender.com/api/routes/` should return JSON data of the 14 AMTS routes!
 
 ---
 
-### STEP 4: Deploy React Frontend on Vercel
+### STEP 2: Deploy React Frontend on Vercel
 
-1. Go to [Vercel.com](https://vercel.com) and click **Add New...** $\rightarrow$ **Project**.
-2. Import your GitHub repository (`amts-live-portal`).
-3. Configure the framework and directories:
+1. Sign in to **[Vercel.com](https://vercel.com)**.
+2. Click **Add New...** $\rightarrow$ **Project**.
+3. Import your GitHub repository: `PATNI-CHIRAG/AMTS_BUS_PORTAL`.
+4. Configure the project:
    - **Framework Preset**: `Vite`
-   - **Root Directory**: Click edit and select `frontend`
-4. Under **Environment Variables**, add:
-   - `VITE_API_BASE_URL`: `https://amts-api.onrender.com` *(your live Render backend URL)*
-5. Update [`frontend/vercel.json`](frontend/vercel.json) if you prefer reverse proxying API calls without CORS:
-   ```json
-   {
-     "rewrites": [
-       {
-         "source": "/api/:match*",
-         "destination": "https://amts-api.onrender.com/api/:match*"
-       },
-       {
-         "source": "/(.*)",
-         "destination": "/index.html"
-       }
-     ]
-   }
-   ```
-6. Click **Deploy**. Vercel will build and assign you a global live URL (e.g. `https://amts-portal.vercel.app`).
+   - **Root Directory**: Click **Edit** and select `frontend`
+   - **Build Command**: `npm run build` (default)
+   - **Output Directory**: `dist` (default)
+5. Under **Environment Variables**, add:
+   - **Name**: `VITE_API_BASE_URL`
+   - **Value**: `https://<YOUR-RENDER-BACKEND-URL>` (e.g. `https://amts-api.onrender.com`, **without** trailing slash)
+6. Click **Deploy**.
+7. Vercel will build the frontend in ~30 seconds and give you a global production URL:
+   `https://amts-bus-portal.vercel.app` (or similar).
 
 ---
 
-### STEP 5: Create Admin User on Live Backend
+### STEP 3: Verify Your Live System
 
-In Render's dashboard, go to your Web Service $\rightarrow$ **Shell** tab and run:
-```bash
-python manage.py createsuperuser --username admin --email admin@amts.gov.in
-```
-When prompted, set password to:
-`admin@123`
+Now anyone can open your portal on desktop, tablet, or mobile!
 
----
+1. **Commuter Portal**: Open `https://<YOUR-VERCEL-URL>`:
+   - Test route search, stop viewer, fare calculation, and interactive Leaflet map.
+   - Register a commuter account, book an e-ticket, and view the QR ticket in your passbook.
+2. **Admin Command Center**: Open `https://<YOUR-VERCEL-URL>/#admin-dashboard` (or click Admin Login in header):
+   - Login Credentials:
+     - **Username**: `admin`
+     - **Password**: `admin@123`
+   - Verify:
+     - Live Fleet Telemetry & GPS Dispatch Matrix.
+     - Real-time bus speed, heading, and battery/fuel telemetry.
+     - Add/Manage Routes, Buses, and Bus Stands.
+     - Post live service advisories.
 
-## 🐳 Alternative: 1-Command Docker Deployment (VPS / DigitalOcean / AWS EC2)
-
-If deploying to a single Linux server (Ubuntu/Debian):
-
-1. Install Docker & Docker Compose:
-   ```bash
-   sudo apt update && sudo apt install -y docker.io docker-compose-v2
-   ```
-
-2. Clone repository onto server:
-   ```bash
-   git clone https://github.com/<YOUR_GITHUB_USERNAME>/amts-live-portal.git
-   cd amts-live-portal
-   ```
-
-3. Launch full stack (Database + Django + React Nginx):
-   ```bash
-   docker compose up -d --build
-   ```
-
-4. Run migrations and create admin in container:
-   ```bash
-   docker compose exec backend python manage.py migrate
-   docker compose exec backend python manage.py createsuperuser
-   ```
-
-Your portal is now live at `http://your-server-ip:3000` (Frontend) and `http://your-server-ip:8000` (Backend)!
-
----
-
-## 🎯 Final Live Verification Check
-
-Once deployed, test the following URLs on desktop and mobile phones:
-1. `https://<YOUR-FRONTEND-URL>/` $\rightarrow$ Public Live Bus Search & Tracker.
-2. `https://<YOUR-FRONTEND-URL>/#admin-dashboard` $\rightarrow$ Government Admin Dashboard.
-3. Login as Admin: Username `admin` / Password `admin@123`.
-4. Register a commuter account $\rightarrow$ Book e-ticket $\rightarrow$ View Passbook.
