@@ -5,6 +5,7 @@ import io
 import datetime
 import random
 from django.core.management.base import BaseCommand
+from django.conf import settings
 from django.db import transaction
 from django.utils import timezone
 from transit.models import (
@@ -38,9 +39,15 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         self.stdout.write(self.style.NOTICE("Beginning multi-route AMTS network ingestion across 12 major lines..."))
 
-        gtfs_zip_path = os.path.join("data", "source", "gtfs.zip")
-        if not os.path.exists(gtfs_zip_path):
-            self.stderr.write(f"GTFS zip file not found at {gtfs_zip_path}")
+        candidate_paths = [
+            os.path.join("data", "source", "gtfs.zip"),
+            os.path.join("..", "data", "source", "gtfs.zip"),
+            os.path.join(str(settings.BASE_DIR), "data", "source", "gtfs.zip"),
+            os.path.join(str(settings.BASE_DIR.parent), "data", "source", "gtfs.zip"),
+        ]
+        gtfs_zip_path = next((p for p in candidate_paths if os.path.exists(p)), None)
+        if not gtfs_zip_path:
+            self.stderr.write("GTFS zip file not found in data/source/gtfs.zip or ../data/source/gtfs.zip")
             return
 
         with transaction.atomic():

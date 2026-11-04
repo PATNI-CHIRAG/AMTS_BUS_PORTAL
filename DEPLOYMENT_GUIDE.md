@@ -41,7 +41,7 @@ This guide provides step-by-step instructions for deploying the **AMTS Live Bus 
 
 3. Link and push your repository:
    ```powershell
-   git remote add origin https://github.com/<YOUR_GITHUB_USERNAME>/amts-live-portal.git
+   git remote add origin https://github.com//amts-live-portal.git
    git branch -M main
    git push -u origin main
    ```
@@ -72,7 +72,7 @@ This guide provides step-by-step instructions for deploying the **AMTS Live Bus 
    - **Environment**: `Python 3`
    - **Build Command**:
      ```bash
-     pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate
+     pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate && python manage.py import_amts_data && python manage.py seed_routes_34_and_50
      ```
    - **Start Command**:
      ```bash

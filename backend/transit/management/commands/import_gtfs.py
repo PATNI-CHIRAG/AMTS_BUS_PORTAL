@@ -11,7 +11,7 @@ import json
 import zipfile
 from collections import defaultdict
 from pathlib import Path
-
+from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 from django.utils import timezone
@@ -100,7 +100,11 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         zip_path = Path(options["zip_path"]).resolve()
         if not zip_path.is_file():
-            raise CommandError(f"GTFS ZIP not found: {zip_path}")
+            fallback = (Path(settings.BASE_DIR).parent / "data" / "source" / "gtfs.zip").resolve()
+            if fallback.is_file():
+                zip_path = fallback
+            else:
+                raise CommandError(f"GTFS ZIP not found: {zip_path}")
 
         try:
             archive = zipfile.ZipFile(zip_path)
