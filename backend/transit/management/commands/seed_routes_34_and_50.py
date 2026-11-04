@@ -160,7 +160,7 @@ class Command(BaseCommand):
                     dist = 0
                     for idx, s in enumerate(p_stops, start=1):
                         RoutePatternStop.objects.create(
-                            pattern=pat,
+                            route_pattern=pat,
                             stop=s,
                             stop_sequence=idx,
                             distance_from_start_m=dist
