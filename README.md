@@ -88,13 +88,5 @@ To access the Municipal Command Center (`/#admin-dashboard`):
 
 ---
 
-## 🌐 Production Deployment
-
-- **Database:** Hosted on [Neon](https://neon.tech) PostgreSQL with PostGIS extension enabled.
-- **Backend:** Deployed as a Web Service on [Render](https://render.com) (`gunicorn core.wsgi:application --bind 0.0.0.0:$PORT`).
-- **Frontend:** Deployed on [Vercel](https://vercel.com) with root directory set to `frontend`.
-
----
-
 ## 📄 License
 Developed for academic, civic, and municipal demonstration purposes. All rights reserved.
